@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minhas Reservas</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--tx:#1d1d1b;--mu:#6b6a65;--bd:#e4e2dc;--ac:#1f6f5c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171716;--card:#222220;--tx:#efeee9;--mu:#a3a199;--bd:#35342f;--ac:#4cb89d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171716;--card:#222220;--tx:#efeee9;--mu:#a3a199;--bd:#35342f;--ac:#4cb89d;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:520px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.prox{text-align:center;padding:20px 14px}
+.prox small{color:var(--mu);font-size:14px}
+.prox .d{font-size:34px;font-weight:700;margin:4px 0}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:8px 14px;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.big{width:100%;padding:12px;font-size:17px;margin-bottom:12px}
+button.s{padding:4px 9px;font-size:14px;color:var(--mu)}
+input,select{font:inherit;width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);margin-bottom:8px}
+label{font-size:13px;color:var(--mu)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav b{text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal .h{font-size:12px;color:var(--mu);padding:2px 0}
+.cal .c{aspect-ratio:1;display:flex;flex-direction:column;overflow:hidden;align-items:center;justify-content:center;border-radius:8px;font-size:14px}
+.sg{flex:1;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;overflow:hidden}
+.nn{font-size:13px;font-weight:600}
+.nm{font-size:9px;max-width:100%;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .c.on{color:#fff;font-weight:600}
+.cal .c.hj{outline:2px solid var(--tx);outline-offset:-2px}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:14px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid rgba(0,0,0,.3)}
+.it{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--bd)}
+.it:first-child{border-top:0}
+.mu{color:var(--mu);font-size:14px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.sum small{display:block;color:var(--mu);font-size:12px}
+.sum strong{font-size:16px}
+.pg{color:#2e9d62}.fl{color:#d4574d}
+</style>
+</head>
+<body>
+<main>
+<div class="card" id="auth" hidden>
+<b>Entrar na sua conta</b>
+<div class="mu" style="margin:6px 0 10px">Entre com a mesma conta do Google no celular e no computador pra ver as mesmas reservas.</div>
+<div id="a-msg" style="color:#c0392b;font-size:14px;margin-bottom:8px"></div>
+<button class="p big" id="a-google" style="margin-bottom:0">Entrar com Google</button>
+</div>
+<div id="app" hidden>
+<div class="card prox" id="prox"></div>
+
+<div class="card" id="setup" hidden>
+<b>Nome dos seus imóveis</b>
+<div style="margin-top:10px"><label>Imóvel 1</label><input id="n1" placeholder="Ex.: Casa da praia"></div>
+<label>Imóvel 2</label><input id="n2" placeholder="Ex.: Apartamento">
+<div id="msg2" style="color:#c0392b;font-size:14px;margin-bottom:8px"></div><button class="p" id="salvaNomes">Salvar nomes</button>
+</div>
+
+<button class="p big" id="novaBtn">Nova reserva</button>
+
+<div class="card" id="form" hidden>
+<label>Imóvel</label><select id="f-im"></select>
+<div class="g2"><div><label>Entrada</label><input id="f-ini" type="date"></div><div><label>Saída</label><input id="f-fim" type="date"></div></div>
+<div class="g2"><div><label>Valor total (R$)</label><input id="f-tot" type="number" inputmode="decimal" min="0" step="0.01"></div><div><label>Já recebido (R$)</label><input id="f-rec" type="number" inputmode="decimal" min="0" step="0.01" value="0"></div></div>
+<label>Nome do hóspede (opcional)</label><input id="f-h">
+<div id="msg" style="color:#c0392b;font-size:14px;margin-bottom:8px"></div><button class="p" id="salvar">Salvar</button> <button id="cancelar">Cancelar</button>
+</div>
+
+<div class="card">
+<div class="nav"><button id="prev">←</button><b id="mes"></b><button id="next">→</button></div>
+<div class="cal" id="cal"></div>
+<div class="leg" id="leg"></div>
+</div>
+
+<div class="card sum" id="sum"></div>
+<div class="card" id="listaCard"><div id="lista"></div></div>
+<div style="text-align:center"><button class="s" id="edNomes">Editar nomes dos imóveis</button> <button class="s" id="sair">Sair da conta</button></div>
+</div>
+</main>
+<script>
+(function(){
+var COR=["#a9e2b5","#0f4d2e"];
+var S={im:[],rs:[]},ref=null,editId=null,forca=false,hoje=new Date();
+var pad=function(n){return n<10?"0"+n:""+n};
+var iso=function(y,m,d){return y+"-"+pad(m+1)+"-"+pad(d)};
+var HOJE=iso(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+var vy=hoje.getFullYear(),vm=hoje.getMonth();
+var $=function(i){return document.getElementById(i)};
+var esc=function(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML};
+var br=function(s){var p=s.split("-");return p[2]+"/"+p[1]+"/"+p[0]};
+var mo=function(n){return n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})};
+var dd=function(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])};
+var casa=function(id){return S.im.filter(function(x){return x.id===id})[0]};
+
+function save(){
+  try{localStorage.setItem("reservas2",JSON.stringify(S))}catch(e){}
+  if(window.AppSync&&window.AppSync.onSave){try{window.AppSync.onSave(S)}catch(e){}}
+}
+function conflito(r){
+  return S.rs.filter(function(o){return o.id!==r.id&&o.im===r.im&&r.ini<o.fim&&r.fim>o.ini})[0];
+}
+function render(){
+  S.im.forEach(function(x,i){x.cor=COR[i]});var tem=S.im.length===2;
+  $("novaBtn").hidden=!tem;
+  if(!tem)$("setup").hidden=false;
+  // próxima reserva
+  var fut=S.rs.filter(function(r){return r.ini>=HOJE}).sort(function(a,b){return a.ini<b.ini?-1:1})[0];
+  if(!tem){$("prox").innerHTML='<small>Comece cadastrando o nome dos seus dois imóveis</small>'}
+  else if(fut){
+    var n=Math.round((dd(fut.ini)-dd(HOJE))/864e5),c=casa(fut.im);
+    $("prox").innerHTML='<small>Próxima reserva</small><div class="d">'+br(fut.ini)+'</div><small><span class="dot" style="background:'+c.cor+'"></span>'+esc(c.nome)+' · '+(n===0?"hoje":n===1?"amanhã":"em "+n+" dias")+'</small>';
+  }else $("prox").innerHTML='<small>Próxima reserva</small><div class="d">—</div><small>Nenhuma reserva futura</small>';
+  // select
+  $("f-im").innerHTML=S.im.map(function(x){return'<option value="'+x.id+'">'+esc(x.nome)+'</option>'}).join("");
+  // calendário
+  $("mes").textContent=new Date(vy,vm,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  var h="DSTQQSS".split("").map(function(l){return'<div class="h">'+l+'</div>'}).join("");
+  var off=new Date(vy,vm,1).getDay(),nd=new Date(vy,vm+1,0).getDate(),i,k;
+  for(i=0;i<off;i++)h+="<div></div>";
+  for(i=1;i<=nd;i++){
+    var s=iso(vy,vm,i),cs=[];
+    S.im.forEach(function(x){var m=S.rs.filter(function(r){return r.im===x.id&&r.ini<=s&&s<=r.fim}).sort(function(p,q){return p.ini<q.ini?1:-1})[0];if(m)cs.push({c:x.cor,n:(m.h||"").split(" ")[0]})});
+    var cl="c"+(s===HOJE?" hj":""),seg="";cs.forEach(function(z,j){seg+='<div class="sg" style="background:'+z.c+';color:'+(z.c===COR[0]?'#143d24':'#fff')+'">'+(j===0?'<span class="nn">'+i+'</span>':'')+(z.n?'<span class="nm">'+esc(z.n)+'</span>':'')+'</div>'});
+    
+    
+    h+='<div class="'+cl+'">'+(seg||i)+'</div>';
+  }
+  $("cal").innerHTML=h;
+  $("leg").innerHTML=S.im.map(function(x){return'<span><span class="dot" style="background:'+x.cor+'"></span>'+esc(x.nome)+'</span>'}).join("");
+  // lista (reservas que tocam o mês)
+  var a=iso(vy,vm,1),b=iso(vy,vm,nd+1>nd?nd:nd);
+  var L=S.rs.filter(function(r){return r.ini<=iso(vy,vm,nd)&&r.fim>=a}).sort(function(x,y){return x.ini<y.ini?-1:1});
+  $("listaCard").hidden=!tem;
+  var pre=iso(vy,vm,1).slice(0,7),tt=0,rr=0;S.rs.forEach(function(r){if(r.ini.slice(0,7)===pre){tt+=r.total||0;rr+=r.rec||0}});
+  $("sum").hidden=!tem;
+  $("sum").innerHTML='<div class="mu" style="grid-column:1/-1;font-size:12px">Reservas que começam neste mês</div><div><small>Total</small><strong>'+mo(tt)+'</strong></div><div><small>Recebido</small><strong class="pg">'+mo(rr)+'</strong></div><div><small>A receber</small><strong class="fl">'+mo(tt-rr)+'</strong></div>';
+  $("lista").innerHTML=L.length?L.map(function(r){
+    var c=casa(r.im)||{nome:"?",cor:"#999"},w=conflito(r),falta=(r.total||0)-(r.rec||0);
+    return'<div class="it"><div><span class="dot" style="background:'+c.cor+'"></span><b>'+esc(c.nome)+'</b><div class="mu">'+br(r.ini)+' → '+br(r.fim)+(r.h?" · "+esc(r.h):"")+(w?' · <span style="color:#c0392b">conflito de datas</span>':"")+'</div>'+(r.total>0?'<div class="mu">'+mo(r.total)+' · '+(falta<=0?'<span class="pg">Quitado</span>':'recebido '+mo(r.rec||0)+' · <span class="fl">falta '+mo(falta)+'</span>')+'</div>':'')+'</div><div>'+(falta>0?'<button class="s" data-a="q" data-i="'+r.id+'">Quitar</button> ':'')+'<button class="s" data-a="ed" data-i="'+r.id+'">Editar</button> <button class="s" data-a="rm" data-i="'+r.id+'">Excluir</button></div></div>';
+  }).join(""):'<div class="mu">Nenhuma reserva neste mês.</div>';
+}
+function abreForm(r){
+  editId=r?r.id:null;
+  $("f-im").value=r?r.im:S.im[0].id;$("f-ini").value=r?r.ini:"";$("f-fim").value=r?r.fim:"";$("f-h").value=r?r.h||"":"";$("f-tot").value=r&&r.total?r.total:"";$("f-rec").value=r&&r.rec?r.rec:0;
+  $("form").hidden=false;$("novaBtn").hidden=true;$("form").scrollIntoView({behavior:"smooth"});
+}
+function fechaForm(){forca=false;$("msg").textContent="";$("form").hidden=true;$("novaBtn").hidden=S.im.length!==2}
+$("novaBtn").onclick=function(){abreForm(null)};
+$("cancelar").onclick=fechaForm;["f-im","f-ini","f-fim"].forEach(function(i){$(i).onchange=function(){forca=false}});
+$("salvar").onclick=function(){try{salvaRes()}catch(e){$("msg").textContent="Erro: "+e.message}};function salvaRes(){
+  var o={id:editId||String(Date.now()),im:$("f-im").value,ini:$("f-ini").value,fim:$("f-fim").value,h:$("f-h").value.trim(),total:parseFloat($("f-tot").value)||0,rec:parseFloat($("f-rec").value)||0};
+  var M=$("msg");M.textContent="";if(!o.ini||!o.fim){M.textContent="Escolha a data de entrada e de saída.";return}
+  if(o.fim<=o.ini){M.textContent="A saída precisa ser depois da entrada.";return}if(o.rec>o.total){M.textContent="O valor recebido não pode ser maior que o total.";return}
+  var c=conflito(o);
+  if(c&&!forca){M.textContent="Esse imóvel já tem reserva nessas datas ("+br(c.ini)+" → "+br(c.fim)+"). Aperte Salvar de novo se quiser salvar mesmo assim.";forca=true;return}forca=false;
+  if(editId)S.rs=S.rs.map(function(x){return x.id===editId?o:x});else S.rs.push(o);
+  var p=o.ini.split("-");vy=+p[0];vm=+p[1]-1;
+  save();fechaForm();render();
+};
+$("lista").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  var id=b.dataset.i,r=S.rs.filter(function(x){return x.id===id})[0];
+  if(b.dataset.a==="rm"){if(b.dataset.c){S.rs=S.rs.filter(function(x){return x.id!==id});save();render()}else{b.dataset.c="1";b.textContent="Confirmar?"}}
+  if(b.dataset.a==="ed")abreForm(r);
+  if(b.dataset.a==="q"){r.rec=r.total;save();render()}
+});
+$("prev").onclick=function(){vm--;if(vm<0){vm=11;vy--}render()};
+$("next").onclick=function(){vm++;if(vm>11){vm=0;vy++}render()};
+$("edNomes").onclick=function(){
+  $("n1").value=S.im[0]?S.im[0].nome:"";$("n2").value=S.im[1]?S.im[1].nome:"";
+  $("setup").hidden=false;$("setup").scrollIntoView({behavior:"smooth"});
+};
+$("salvaNomes").onclick=function(){
+  var a=$("n1").value.trim(),b=$("n2").value.trim();
+  if(!a||!b){$("msg2").textContent="Digite o nome dos dois imóveis.";return}
+  S.im=[{id:"a",nome:a,cor:COR[0]},{id:"b",nome:b,cor:COR[1]}];
+  save();$("setup").hidden=true;render();
+};
+
+try{var l=JSON.parse(localStorage.getItem("reservas2")||"null");if(l&&l.im){S=l;S.rs=S.rs||[]}}catch(e){}
+window.AppSync={ready:false,onSave:null,
+  get:function(){return S},
+  set:function(d){var v=$("f-im").value;S=JSON.parse(JSON.stringify(d));S.rs=S.rs||[];S.im=S.im||[];try{localStorage.setItem("reservas2",JSON.stringify(S))}catch(e){}$("setup").hidden=S.im.length===2;render();if(v)$("f-im").value=v}};
+render();
+setTimeout(function(){if(!window.AppSync.ready)$("app").hidden=false},4000);
+})();
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// ===== COLE AQUI A CONFIGURAÇÃO DO FIREBASE (troque o bloco abaixo pelo seu) =====
+const firebaseConfig = {
+  apiKey: "AIzaSyAMfKMPnxrIwchzimd0Dg3ZRWtNx_BhzGk",
+  authDomain: "alugueis-4088a.firebaseapp.com",
+  projectId: "alugueis-4088a",
+  storageBucket: "alugueis-4088a.firebasestorage.app",
+  messagingSenderId: "733244627267",
+  appId: "1:733244627267:web:4613d4ca6ea21cf7e7b7f6"
+};
+// =================================================================================
+
+const $ = i => document.getElementById(i);
+const A = window.AppSync;
+const erros = {
+  "auth/popup-closed-by-user":"Login cancelado. Toque em Entrar com Google de novo.",
+  "auth/cancelled-popup-request":"",
+  "auth/popup-blocked":"O navegador bloqueou a janela do Google. Libere os pop-ups deste site e tente de novo.",
+  "auth/unauthorized-domain":"Este endereço ainda não foi autorizado no Firebase (veja o passo a passo).",
+  "auth/network-request-failed":"Sem internet. Tente de novo."
+};
+function mostraLogin(msg){A.ready=true;$("app").hidden=true;$("auth").hidden=false;if(msg)$("a-msg").textContent=msg}
+
+if (firebaseConfig.apiKey.indexOf("COLE") === 0) {
+  mostraLogin("Falta colar a configuração do Firebase no arquivo index.html (veja o passo a passo).");
+} else {
+  const auth = getAuth(initializeApp(firebaseConfig));
+  const db = getFirestore();
+  let unsub = null;
+  $("a-google").onclick = async () => {
+    $("a-msg").textContent = "";
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch (e) { $("a-msg").textContent = e.code in erros ? erros[e.code] : ("Erro: " + (e.code || e.message)); }
+  };
+  $("sair").onclick = () => signOut(auth);
+  onAuthStateChanged(auth, u => {
+    if (unsub) { unsub(); unsub = null; }
+    if (!u) { A.onSave = null; mostraLogin(); return; }
+    A.ready = true; $("auth").hidden = true; $("app").hidden = false;
+    const ref = doc(db, "reservas", "compartilhado");
+    const meu = doc(db, "reservas", u.uid);
+    $("sair").textContent = "Sair (" + (u.email || "conta") + ")";
+    A.onSave = d => setDoc(ref, JSON.parse(JSON.stringify(d))).catch(() => {});
+    unsub = onSnapshot(ref, async snap => {
+      if (snap.exists()) { if (!snap.metadata.hasPendingWrites) A.set(snap.data()); return; }
+      if (snap.metadata.fromCache) return;
+      try { const p = await getDoc(meu); if (p.exists()) { A.set(p.data()); A.onSave(A.get()); return; } } catch (e) {}
+      const l = A.get(); if (l.im.length || l.rs.length) A.onSave(l);
+    }, err => {
+      if (unsub) { unsub(); unsub = null; }
+      A.onSave = null;
+      mostraLogin(err && err.code === "permission-denied"
+        ? "A conta " + (u.email || "") + " não tem acesso. Peça pro dono das reservas liberar o seu e-mail."
+        : "Não consegui carregar as reservas. Tente de novo.");
+      signOut(auth);
+    });
+  });
+}
+</script>
+</body>
+</html>
